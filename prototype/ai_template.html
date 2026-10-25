@@ -1,0 +1,320 @@
+<title>GaitSense Research Review</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;600&family=Atkinson+Hyperlegible+Next:wght@400;600;800&display=swap">
+<style>
+/* Layout: instrument console. Patient index on the left, one patient's record on the right, reading order = evidence first, interpretation second, model evidence last. */
+:root {
+  --paper: #f4f7f7; --panel: #ffffff; --ink: #142120; --ink-2: #4e5d5c; --rule: #d6dfde;
+  --accent: #1d58c4; --band: rgba(29, 88, 196, 0.16); --flag: #a85305; --flag-bg: #fdf1e3; --ok-bg: #eaf1f0;
+  --notice: #1c2a29; --notice-ink: #f4f7f7;
+  --f-display: "Atkinson Hyperlegible Next", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible Next", "Segoe UI", system-ui, sans-serif;
+  --f-data: "Atkinson Hyperlegible Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --s1: 0.25rem; --s2: 0.5rem; --s3: 0.75rem; --s4: 1rem; --s5: 1.5rem; --s6: 2rem;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #0e1514; --panel: #152020; --ink: #e2ebea; --ink-2: #9db0ae; --rule: #273534;
+  --accent: #7ea8ff; --band: rgba(126, 168, 255, 0.20); --flag: #f2a650; --flag-bg: #3a2a16; --ok-bg: #1b2a29;
+  --notice: #e2ebea; --notice-ink: #0e1514; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #0e1514; --panel: #152020; --ink: #e2ebea; --ink-2: #9db0ae; --rule: #273534;
+  --accent: #7ea8ff; --band: rgba(126, 168, 255, 0.20); --flag: #f2a650; --flag-bg: #3a2a16; --ok-bg: #1b2a29;
+  --notice: #e2ebea; --notice-ink: #0e1514; color-scheme: dark }
+* { box-sizing: border-box }
+body { background: var(--paper); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.5; }
+.wrap { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: var(--s4) var(--s6); max-width: 1320px; margin: 0 auto; }
+.notice { background: var(--notice); color: var(--notice-ink); padding-block: var(--s3); }
+.notice .wrap { padding-block: 0; display: flex; gap: var(--s3); align-items: baseline; flex-wrap: wrap; }
+.notice strong { font-family: var(--f-display); font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; font-size: 0.78rem; }
+.notice span { font-size: 0.92rem; max-width: 95ch; }
+header.top { display: flex; justify-content: space-between; align-items: end; gap: var(--s4); flex-wrap: wrap; padding-block: var(--s5) var(--s4); border-bottom: 1px solid var(--rule); }
+h1 { font-family: var(--f-display); font-weight: 800; font-size: clamp(1.6rem, 3vw, 2.2rem); line-height: 1.1; margin: 0; text-wrap: balance; }
+.sub { color: var(--ink-2); margin: var(--s1) 0 0; max-width: 70ch; }
+.keyfacts { font-family: var(--f-data); font-size: 0.8rem; color: var(--ink-2); display: grid; grid-template-columns: auto auto; gap: 2px var(--s3); }
+.keyfacts b { color: var(--ink); font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
+.app { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: var(--s5); padding-top: var(--s5); }
+.index { display: flex; flex-direction: column; gap: var(--s2); min-width: 0; }
+.index label { font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2); }
+.index input, .index select { font: inherit; padding: var(--s2) var(--s3); border: 1px solid var(--rule); background: var(--panel); color: var(--ink); border-radius: 4px; width: 100%; }
+.plist { list-style: none; margin: 0; padding: 0; max-height: 70vh; overflow: auto; border: 1px solid var(--rule); border-radius: 4px; background: var(--panel); }
+.plist button { all: unset; box-sizing: border-box; display: grid; grid-template-columns: 1fr auto; width: 100%; padding: var(--s2) var(--s3); cursor: pointer; border-bottom: 1px solid var(--rule); font-family: var(--f-data); font-size: 0.85rem; }
+.plist button:hover { background: var(--ok-bg) }
+.plist button[aria-current="true"] { background: var(--accent); color: var(--panel); }
+.plist button:focus-visible, button:focus-visible, .tabs button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.plist .meta { color: inherit; opacity: 0.75 }
+.mobile-pick { display: none }
+main { min-width: 0; display: flex; flex-direction: column; gap: var(--s5); }
+.phead { display: flex; flex-wrap: wrap; gap: var(--s5); align-items: baseline; }
+.phead h2 { font-family: var(--f-display); font-weight: 800; font-size: 1.6rem; margin: 0; }
+.facts { display: flex; flex-wrap: wrap; gap: var(--s4); font-size: 0.9rem; color: var(--ink-2); }
+.facts b { color: var(--ink); font-weight: 600; font-family: var(--f-data); font-variant-numeric: tabular-nums; }
+section.block { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: var(--s4); min-width: 0; }
+section.block h3 { font-family: var(--f-display); font-size: 1.02rem; font-weight: 800; margin: 0 0 var(--s1); }
+.hint { color: var(--ink-2); font-size: 0.85rem; margin: 0 0 var(--s3); max-width: 80ch; }
+.tabs { display: flex; gap: var(--s1); flex-wrap: wrap; margin-bottom: var(--s3); }
+.tabs button { font: inherit; font-size: 0.85rem; padding: var(--s1) var(--s3); border: 1px solid var(--rule); background: transparent; color: var(--ink); border-radius: 999px; cursor: pointer; }
+.tabs button[aria-pressed="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+.chartbox { position: relative; overflow-x: auto; }
+svg.chart { width: 100%; min-width: 520px; height: auto; display: block; }
+svg.chart text { fill: var(--ink-2); font-family: var(--f-data); font-size: 11px; }
+svg .grid { stroke: var(--rule); stroke-width: 1 }
+svg .zero { stroke: var(--ink-2); stroke-width: 1; stroke-dasharray: 3 3 }
+svg .obs { fill: var(--ink) } svg .obsbar { stroke: var(--ink); stroke-width: 1.5 }
+svg .pred { fill: var(--accent) } svg .predbar { stroke: var(--band); stroke-width: 12; stroke-linecap: round }
+svg .hit { fill: transparent; cursor: pointer } svg .sel { fill: var(--ok-bg) }
+.legend { display: flex; gap: var(--s4); flex-wrap: wrap; font-size: 0.8rem; color: var(--ink-2); margin-top: var(--s2); }
+.legend i { display: inline-block; width: 10px; height: 10px; margin-right: 6px; vertical-align: -1px; border-radius: 2px; }
+.tip { position: absolute; pointer-events: none; background: var(--ink); color: var(--panel); font-family: var(--f-data); font-size: 0.78rem; padding: var(--s2) var(--s3); border-radius: 4px; white-space: nowrap; transform: translate(-50%, -110%); }
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 0.86rem; }
+th, td { padding: 6px 8px; border-bottom: 1px solid var(--rule); text-align: right; white-space: nowrap; }
+th { font-weight: 600; color: var(--ink-2); font-size: 0.74rem; letter-spacing: 0.04em; text-transform: uppercase; }
+td { font-family: var(--f-data); font-variant-numeric: tabular-nums; }
+th:first-child, td:first-child { text-align: left }
+tr.clickable { cursor: pointer } tr.clickable:hover td { background: var(--ok-bg) } tr[aria-selected="true"] td { background: var(--ok-bg); font-weight: 600 }
+.grp { border-left: 1px solid var(--rule) }
+.interp { display: flex; flex-direction: column; gap: var(--s2); }
+.vrow { display: grid; grid-template-columns: 5.5rem minmax(0, 1fr); gap: var(--s3); padding: var(--s2) 0; border-bottom: 1px solid var(--rule); cursor: pointer; }
+.vrow[aria-selected="true"] { background: var(--ok-bg); }
+.vrow .when { font-family: var(--f-data); font-size: 0.82rem; color: var(--ink-2); }
+.chips { display: flex; gap: var(--s1); flex-wrap: wrap; margin-bottom: 4px; }
+.chip { font-size: 0.74rem; padding: 2px 8px; border-radius: 3px; border: 1px solid var(--rule); color: var(--ink-2); white-space: nowrap; }
+.chip.on { background: var(--flag-bg); color: var(--flag); border-color: var(--flag); font-weight: 600; }
+.chip.info { background: var(--ok-bg); color: var(--ink); }
+.vrow p { margin: 0; font-size: 0.88rem; max-width: 80ch; }
+.two { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: var(--s5); }
+.small { font-size: 0.8rem; color: var(--ink-2); }
+.yes { color: var(--ink) } .no { color: var(--flag); font-weight: 600 }
+footer { color: var(--ink-2); font-size: 0.8rem; border-top: 1px solid var(--rule); padding-top: var(--s3); max-width: 100ch; }
+@media (max-width: 1180px) { .two { grid-template-columns: minmax(0, 1fr) } }
+@media (max-width: 860px) {
+  .app { grid-template-columns: minmax(0, 1fr) } .index { display: none } .mobile-pick { display: block }
+  .two { grid-template-columns: minmax(0, 1fr) }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important } }
+</style>
+
+<div class="notice" role="note"><div class="wrap">
+  <strong>Research prototype only</strong>
+  <span>Not validated for clinical diagnosis, treatment decisions, impairment ratings, maximum medical improvement determinations, return-to-work decisions, or insurance eligibility decisions. Outputs describe force-plate measurements; they do not label anyone as recovered, deteriorating, malingering or permanently impaired.</span>
+</div></div>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>GaitSense research review</h1>
+      <p class="sub">Held-out GaitRec patients (Austrian workers' compensation rehabilitation centre). Each prediction uses only that patient's earlier visits; every model was frozen before these patients were opened.</p>
+    </div>
+    <div class="keyfacts" id="keyfacts"></div>
+  </header>
+
+  <div class="app">
+    <aside class="index" aria-label="Patients">
+      <label for="q">Find research ID</label>
+      <input id="q" type="search" placeholder="R-0…" autocomplete="off">
+      <label for="cls">Injury group</label>
+      <select id="cls"><option value="">All groups</option><option>Ankle</option><option>Knee</option><option>Hip</option><option>Heel</option></select>
+      <ul class="plist" id="plist"></ul>
+      <p class="small" id="count"></p>
+    </aside>
+
+    <main>
+      <div class="mobile-pick"><label class="small" for="mpick">Patient</label> <select id="mpick"></select></div>
+      <div class="phead"><h2 id="pid"></h2><div class="facts" id="pfacts"></div></div>
+
+      <section class="block" aria-labelledby="h-traj">
+        <h3 id="h-traj">Trajectory and predictions</h3>
+        <p class="hint">Black: measured affected-minus-unaffected value with its 95% within-visit interval. Blue: the Gaussian process prediction made from earlier visits only, with its 95% predictive interval. Select a visit for detail.</p>
+        <div class="tabs" id="tabs" role="group" aria-label="Measure"></div>
+        <div class="chartbox" id="chartbox"><svg class="chart" id="chart" viewBox="0 0 760 280" role="img" aria-label="Trajectory chart"></svg><div class="tip" id="tip" hidden></div></div>
+        <div class="legend"><span><i style="background:var(--ink)"></i>Measured visit mean ± 95% within-visit</span><span><i style="background:var(--accent)"></i>GP prediction</span><span><i style="background:var(--band)"></i>95% predictive interval</span></div>
+      </section>
+
+      <div class="two">
+        <section class="block" aria-labelledby="h-int">
+          <h3 id="h-int">Visit-by-visit interpretation</h3>
+          <p class="hint">Target: affected-minus-unaffected peak vertical force. Chips show which monitoring architecture flagged the visit pair; flags are prompts for review, not findings.</p>
+          <div class="interp" id="interp"></div>
+        </section>
+        <section class="block" aria-labelledby="h-cmp">
+          <h3 id="h-cmp">Model comparison, selected visit</h3>
+          <p class="hint" id="cmp-hint"></p>
+          <div class="tablewrap"><table id="cmp"></table></div>
+          <p class="small" id="cmp-note"></p>
+        </section>
+      </div>
+
+      <section class="block" aria-labelledby="h-meas">
+        <h3 id="h-meas">Measurements by visit</h3>
+        <p class="hint">Visit means over valid trials. a = affected leg, u = unaffected leg, Δ = a − u. Peak in body weights (BW), impulses in BW·s, stance in seconds.</p>
+        <div class="tablewrap"><table id="meas"></table></div>
+      </section>
+
+      <section class="block" aria-labelledby="h-cal">
+        <h3 id="h-cal">How reliable are these predictions?</h3>
+        <p class="hint" id="cal-hint"></p>
+        <div class="two">
+          <div class="tablewrap"><table id="cal"></table></div>
+          <div class="tablewrap"><table id="calc"></table></div>
+        </div>
+        <p class="small" id="cal-note"></p>
+      </section>
+
+      <section class="block" aria-labelledby="h-c2">
+        <h3 id="h-c2">Clinical recovery prediction (Capability 2)</h3>
+        <p class="hint">Status: built and tested on labelled synthetic data only. No clinical results.</p>
+        <p class="small" style="max-width:80ch">This panel will compare clinical-only, biomechanics-only and combined models for an independently measured recovery outcome (for example a validated function score or return to work) once a linked dataset has been verified. GaitRec has no such outcomes, so nothing here predicts recovery. Everything above describes force measurements only.</p>
+      </section>
+
+      <footer>Monitoring architectures: A raw asymmetry (limb symmetry index change ≥ 10 points), B healthy reference (crossing the healthy controls' 95% band), C statistical change limit (|z| > 1.96 including between-visit variation τ, which mixes measurement variation and genuine change), D predictive (observed value outside the GP's 95% predictive range). Data: GaitRec (Horsak et al., Scientific Data 2020), CC BY 4.0. Research identifiers are re-numbered and do not match GaitRec subject IDs.</footer>
+    </main>
+  </div>
+</div>
+
+<script>
+const DATA = /*__DATA__*/null;
+const P = DATA.patients, C = DATA.calib, M = DATA.meta;
+const FEAT = { peak_v: ["Peak vertical force", "BW", 3], braking: ["Braking impulse", "BW·s", 4], propulsive: ["Propulsive impulse", "BW·s", 4], stance_s: ["Stance duration", "s", 3] };
+const TGT = { peak_v: "d_peak_v", braking: "d_braking", propulsive: "d_propulsive", stance_s: "d_stance_s" };
+const MODELS = [["M0b", "Last value + τ"], ["M1", "Ridge regression"], ["M2", "Mixed model"], ["M3", "Gaussian process"]];
+let cur = 0, feat = "peak_v", selVisit = null;
+const $ = (id) => document.getElementById(id);
+const fmt = (x, d = 3) => (x === null || x === undefined ? "–" : (x >= 0 ? "+" : "−") + Math.abs(x).toFixed(d));
+const num = (x, d = 3) => (x === null || x === undefined ? "–" : x.toFixed(d));
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+$("keyfacts").innerHTML = `<span>Test patients</span><b>${P.length}</b><span>Test predictions</span><b>${C.n_targets}</b>` +
+  `<span>GP 95% coverage</span><b>${(C.overall.M3[0] * 100).toFixed(1)}%</b><span>Same-day-noise coverage</span><b>${(C.overall.M0a[0] * 100).toFixed(1)}%</b>`;
+
+function renderList() {
+  const q = $("q").value.trim().toUpperCase(), g = $("cls").value;
+  const items = P.map((p, i) => [p, i]).filter(([p]) => (!q || p.id.includes(q)) && (!g || p.cls === g));
+  $("plist").innerHTML = items.map(([p, i]) => `<li><button data-i="${i}" aria-current="${i === cur}"><span>${p.id}</span><span class="meta">${p.cls} · ${p.visits.length}v</span></button></li>`).join("");
+  $("count").textContent = `${items.length} of ${P.length} patients`;
+  $("mpick").innerHTML = P.map((p, i) => `<option value="${i}" ${i === cur ? "selected" : ""}>${p.id} · ${p.cls} · ${p.visits.length} visits</option>`).join("");
+}
+$("plist").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) select(+b.dataset.i); });
+$("q").addEventListener("input", renderList); $("cls").addEventListener("change", renderList);
+$("mpick").addEventListener("change", (e) => select(+e.target.value));
+
+$("tabs").innerHTML = Object.entries(FEAT).map(([k, v]) => `<button data-f="${k}" aria-pressed="${k === feat}">Δ ${v[0].toLowerCase()}</button>`).join("");
+$("tabs").addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; feat = b.dataset.f; [...$("tabs").children].forEach((x) => x.setAttribute("aria-pressed", x.dataset.f === feat)); drawChart(); });
+
+function select(i) { cur = i; const p = P[i]; selVisit = p.visits.length > 1 ? p.visits[p.visits.length - 1].no : 1; try { localStorage.setItem("gs_pid", p.id); } catch (e) {} render(); }
+
+function render() {
+  const p = P[cur]; renderList();
+  $("pid").textContent = p.id;
+  const v = p.visits, span = v[v.length - 1].day, minTr = Math.min(...v.map((x) => Math.min(x.n_a, x.n_u)));
+  const hiSE = v.filter((x) => x.peak_v[3] > M.se_hi).length;
+  $("pfacts").innerHTML = `<span>Injury group <b>${p.cls}</b></span><span>Visits <b>${v.length}</b></span><span>Span <b>${span} days</b></span>` +
+    `<span>Fewest valid trials per leg <b>${minTr}</b></span><span>Visits with high measurement noise <b>${hiSE}</b></span>`;
+  drawChart(); drawInterp(); drawCmp(); drawMeas();
+}
+
+function drawChart() {
+  const p = P[cur], v = p.visits, t = TGT[feat], d = FEAT[feat][2];
+  const W = 760, H = 280, L = 62, R = 30, T = 14, B = 34;
+  const pts = v.map((x) => ({ no: x.no, day: x.day, y: x[feat][2], se: x[feat][3], pr: x.pred && x.pred[t] && x.pred[t].M3 }));
+  let lo = Infinity, hi = -Infinity;
+  pts.forEach((q) => { lo = Math.min(lo, q.y - 1.96 * q.se); hi = Math.max(hi, q.y + 1.96 * q.se); if (q.pr) { lo = Math.min(lo, q.pr[0] - 1.96 * q.pr[1]); hi = Math.max(hi, q.pr[0] + 1.96 * q.pr[1]); } });
+  lo = Math.min(lo, 0); hi = Math.max(hi, 0); const pad = (hi - lo) * 0.08 || 0.01; lo -= pad; hi += pad;
+  const lastDay = Math.max(7, pts[pts.length - 1].day), maxDay = lastDay * 1.04 + 1;
+  const x = (dd) => L + (dd / maxDay) * (W - L - R), y = (val) => T + (hi - val) / (hi - lo) * (H - T - B);
+  const step = niceStep((hi - lo) / 5); let s = "";
+  for (let g = Math.ceil(lo / step) * step; g <= hi; g += step) s += `<line class="grid" x1="${L}" x2="${W - R}" y1="${y(g)}" y2="${y(g)}"/><text x="${L - 6}" y="${y(g) + 4}" text-anchor="end">${(Math.abs(g) < step / 2 ? 0 : g).toFixed(step < 0.01 ? 3 : 2)}</text>`;
+  const dstep = maxDay > 60 ? 14 : 7;
+  for (let dd = 0; dd <= lastDay; dd += dstep) s += `<text x="${x(dd)}" y="${H - B + 16}" text-anchor="middle">${dd}</text>`;
+  s += `<text x="${(L + W - R) / 2}" y="${H - 4}" text-anchor="middle">days since first visit</text>`;
+  s += `<line class="zero" x1="${L}" x2="${W - R}" y1="${y(0)}" y2="${y(0)}"/><text x="${L + 6}" y="${y(0) - 5}">0 = symmetric</text>`;
+  s += `<text transform="translate(14 ${(T + H - B) / 2}) rotate(-90)" text-anchor="middle">Δ ${FEAT[feat][0].toLowerCase()} (${FEAT[feat][1]})</text>`;
+  pts.forEach((q) => {
+    const cx = x(q.day), selc = q.no === selVisit;
+    if (selc) s += `<rect class="sel" x="${cx - 14}" y="${T}" width="28" height="${H - T - B}"/>`;
+    if (q.pr) { const px = cx + 7; s += `<line class="predbar" x1="${px}" x2="${px}" y1="${y(q.pr[0] - 1.96 * q.pr[1])}" y2="${y(q.pr[0] + 1.96 * q.pr[1])}"/><rect class="pred" x="${px - 4}" y="${y(q.pr[0]) - 4}" width="8" height="8"/>`; }
+    const ox = cx - 4;
+    s += `<line class="obsbar" x1="${ox}" x2="${ox}" y1="${y(q.y - 1.96 * q.se)}" y2="${y(q.y + 1.96 * q.se)}"/><circle class="obs" cx="${ox}" cy="${y(q.y)}" r="4.5"/>`;
+    s += `<rect class="hit" data-no="${q.no}" x="${cx - 16}" y="${T}" width="32" height="${H - T - B}"><title>Visit ${q.no}</title></rect>`;
+  });
+  const svg = $("chart"); svg.innerHTML = s;
+  svg.onmousemove = (e) => {
+    const r = e.target.closest(".hit"); const tip = $("tip");
+    if (!r) { tip.hidden = true; return; }
+    const q = pts.find((z) => z.no === +r.dataset.no), box = $("chartbox").getBoundingClientRect();
+    tip.innerHTML = `Visit ${q.no} · day ${q.day}<br>measured ${fmt(q.y, d)} ± ${(1.96 * q.se).toFixed(d)}` + (q.pr ? `<br>GP ${fmt(q.pr[0], d)} ± ${(1.96 * q.pr[1]).toFixed(d)}` : "<br>baseline visit, no prediction");
+    tip.style.left = (e.clientX - box.left + $("chartbox").scrollLeft) + "px"; tip.style.top = (e.clientY - box.top) + "px"; tip.hidden = false;
+  };
+  svg.onmouseleave = () => { $("tip").hidden = true; };
+  svg.onclick = (e) => { const r = e.target.closest(".hit"); if (r) { selVisit = +r.dataset.no; drawChart(); drawInterp(); drawCmp(); drawMeas(); } };
+}
+function niceStep(raw) { const p = Math.pow(10, Math.floor(Math.log10(raw))); const m = raw / p; return (m < 1.5 ? 1 : m < 3.5 ? 2 : m < 7.5 ? 5 : 10) * p; }
+
+function interpret(prev, v) {
+  if (!prev) return { chips: [["info", "Baseline visit"]], text: "First usable visit of the stay. There is nothing earlier to compare with, so the evidence is insufficient for any change statement." };
+  const m = v.mon || {}, chips = [], dY = v.peak_v[2] - prev.peak_v[2];
+  if (v.peak_v[3] > M.se_hi || prev.peak_v[3] > M.se_hi) chips.push(["on", "Uncertain measurement"]);
+  if (m.C) chips.push(["on", "Statistically unusual change"]);
+  if (m.D) chips.push(["on", "Prediction deviation"]);
+  if (!m.C && !m.D) chips.push(["info", "Change within expected variation"]);
+  let text = `Observed change ${fmt(dY)} BW since visit ${prev.no} (${v.day - prev.day} days; change-limit z = ${num(m.zC, 2)}). `;
+  if (m.C && !m.D) text += `The change from the last visit is large relative to day-to-day variation, but the trajectory model expected a value near ${fmt(m.muD)} BW, so the new value is not surprising given all earlier visits.`;
+  else if (m.D && !m.C) text += `The step from the last visit is within the change limit, but the value lies outside the range predicted from all earlier visits (${fmt(m.muD)} ± ${(1.96 * m.sdD).toFixed(3)} BW). The two methods ask different questions.`;
+  else if (m.C && m.D) text += `Both the change limit and the trajectory model flag this visit.`;
+  else text += `Neither the change limit nor the trajectory model flags this visit.`;
+  if (m.A && Math.abs(m.dU) >= 0.5 * Math.abs(dY)) text += ` The symmetry index moved partly because the unaffected leg changed (${fmt(m.dU)} BW).`;
+  if (chips.some((c) => c[1] === "Uncertain measurement")) text += ` Trial-to-trial noise at one of these visits is in the top 10% of training visits, so read this change with extra caution.`;
+  return { chips, text };
+}
+
+function drawInterp() {
+  const v = P[cur].visits;
+  $("interp").innerHTML = v.map((x, i) => {
+    const r = interpret(i ? v[i - 1] : null, x), m = x.mon;
+    const arch = m ? ["A", "B", "C", "D"].map((a) => `<span class="chip ${m[a] ? "on" : ""}" title="Architecture ${a}">${a} ${m[a] ? "flag" : "–"}</span>`).join("") : "";
+    return `<div class="vrow" data-no="${x.no}" aria-selected="${x.no === selVisit}" tabindex="0"><div class="when">Visit ${x.no}<br>day ${x.day}</div><div><div class="chips">${r.chips.map((c) => `<span class="chip ${c[0]}">${c[1]}</span>`).join("")}</div>${m ? `<div class="chips">${arch}</div>` : ""}<p>${esc(r.text)}</p></div></div>`;
+  }).join("");
+}
+$("interp").addEventListener("click", (e) => { const r = e.target.closest(".vrow"); if (r) { selVisit = +r.dataset.no; drawChart(); drawInterp(); drawCmp(); drawMeas(); } });
+$("interp").addEventListener("keydown", (e) => { if (e.key === "Enter") { const r = e.target.closest(".vrow"); if (r) r.click(); } });
+
+function drawCmp() {
+  const v = P[cur].visits.find((x) => x.no === selVisit);
+  if (!v || !v.pred || !v.pred.d_peak_v) {
+    $("cmp").innerHTML = ""; $("cmp-hint").textContent = "Select a visit after the first to compare model predictions.";
+    $("cmp-note").textContent = ""; return;
+  }
+  const obs = v.peak_v[2];
+  $("cmp-hint").textContent = `Visit ${v.no}, Δ peak vertical force. Measured ${fmt(obs)} BW. Each model saw only visits 1–${v.no - 1}.`;
+  $("cmp").innerHTML = `<thead><tr><th>Model</th><th>Predicted</th><th>95% range</th><th>Error</th><th>Inside?</th></tr></thead><tbody>` +
+    MODELS.map(([k, name]) => { const pr = v.pred.d_peak_v[k]; if (!pr) return ""; const lo = pr[0] - 1.96 * pr[1], hi = pr[0] + 1.96 * pr[1], ins = obs >= lo && obs <= hi;
+      return `<tr><td>${name}</td><td>${fmt(pr[0])}</td><td>${fmt(lo)} to ${fmt(hi)}</td><td>${fmt(obs - pr[0])}</td><td class="${ins ? "yes" : "no"}">${ins ? "yes" : "no"}</td></tr>`; }).join("") + "</tbody>";
+  const widths = MODELS.map(([k]) => v.pred.d_peak_v[k] ? 3.92 * v.pred.d_peak_v[k][1] : null);
+  $("cmp-note").textContent = `Ranges differ mainly in width (${widths.filter((w) => w).map((w) => w.toFixed(3)).join(" / ")} BW). Last value + τ adds one fixed between-visit variance to everyone; the mixed model and GP narrow the range when earlier visits are consistent and widen it when they are not.`;
+}
+
+function drawMeas() {
+  const v = P[cur].visits, f = Object.keys(FEAT);
+  $("meas").innerHTML = `<thead><tr><th>Visit</th><th>Day</th><th>Trials a/u</th>` + f.map((k) => `<th class="grp">${FEAT[k][0]} a</th><th>u</th><th>Δ</th>`).join("") + `</tr></thead><tbody>` +
+    v.map((x) => `<tr class="clickable" data-no="${x.no}" aria-selected="${x.no === selVisit}"><td>${x.no}</td><td>${x.day}</td><td>${x.n_a}/${x.n_u}</td>` +
+      f.map((k) => `<td class="grp">${num(x[k][0], FEAT[k][2])}</td><td>${num(x[k][1], FEAT[k][2])}</td><td>${fmt(x[k][2], FEAT[k][2])}</td>`).join("") + `</tr>`).join("") + "</tbody>";
+}
+$("meas").addEventListener("click", (e) => { const r = e.target.closest("tr.clickable"); if (r) { selVisit = +r.dataset.no; drawChart(); drawInterp(); drawCmp(); drawMeas(); } });
+
+(function calib() {
+  const names = { M0a: "Last value, same-day noise", M0b: "Last value + τ", M1: "Ridge regression", M2: "Mixed model", M3: "Gaussian process", M4: "Boosted trees" };
+  $("cal-hint").textContent = `Held-out results for Δ peak vertical force: ${C.n_targets} predictions in ${C.n_patients} test patients. A well-calibrated 95% range should contain about 95% of measured values.`;
+  $("cal").innerHTML = `<thead><tr><th>Model</th><th>95% coverage</th><th>MAE</th><th>CRPS</th><th>Mean width</th></tr></thead><tbody>` +
+    Object.entries(C.overall).map(([k, r]) => `<tr><td>${names[k]}</td><td>${(r[0] * 100).toFixed(1)}%</td><td>${r[1].toFixed(4)}</td><td>${r[2].toFixed(4)}</td><td>${r[3].toFixed(3)}</td></tr>`).join("") + "</tbody>";
+  $("calc").innerHTML = `<thead><tr><th>Injury group</th>${MODELS.map(([k]) => `<th>${k}</th>`).join("")}</tr></thead><tbody>` +
+    Object.entries(C.by_class).map(([g, r]) => `<tr><td>${g}</td>${MODELS.map(([k]) => `<td>${(r[k] * 100).toFixed(0)}%</td>`).join("")}</tr>`).join("") + "</tbody>";
+  const m = C.mae_m3_minus_locf, c = C.crps_m3_minus_m2;
+  $("cal-note").textContent = `GP point error versus carrying the last value forward: ${fmt(m.estimate, 4)} BW (95% CI ${fmt(m.ci95[0], 4)} to ${fmt(m.ci95[1], 4)}). GP versus mixed model in CRPS: ${fmt(c.estimate, 5)} (95% CI ${fmt(c.ci95[0], 5)} to ${fmt(c.ci95[1], 5)}), statistically detectable but small; ridge regression performed as well as the GP. The main gain is calibrated uncertainty: ranges based on same-day noise alone missed about one visit in four. Kernel: ${M.kernel}.`;
+})();
+
+let start = 0;
+try { const s = localStorage.getItem("gs_pid"); const i = P.findIndex((p) => p.id === s); if (i >= 0) start = i; } catch (e) {}
+if (!start) { const i = P.findIndex((p) => p.visits.length >= 5 && p.visits.some((v) => v.mon && v.mon.D !== v.mon.C)); if (i >= 0) start = i; }
+select(start);
+</script>

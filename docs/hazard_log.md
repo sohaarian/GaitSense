@@ -1,0 +1,18 @@
+# Hazard log
+
+| ID | Hazard | Effect | Mitigation | Verified by |
+|---|---|---|---|---|
+| H1 | Trials from two patients merged into one session | Corrupted features; leakage between patients | `assert_single_patient_sessions` at load | `test_merged_patients_in_one_session_are_rejected` |
+| H2 | A predictor dated after the prediction time | Optimistic results that could not be reproduced prospectively | `assert_no_future_information`; index = first first-stay session | `test_future_features_are_rejected`, `test_index_is_earliest_first_stay_session` |
+| H3 | Same patient in training and test data | Inflated performance | `patient_folds` (stratified, grouped by patient, checked disjoint) | `test_folds_keep_each_patient_on_one_side` |
+| H4 | Outcome counted after the 365-day window, or from a later return instead of the first | Wrong event labels | Event = first later-stay session within the window | `test_flow_and_events`, `test_event_uses_first_later_session_only` |
+| H5 | Patients without a full observation window treated as event-free | Under-counted events | Window rule against the last patient session | `test_window_rule_respects_explicit_end_date` |
+| H6 | Cohort drifts from the audited, frozen-protocol definition | Results no longer match the protocol | Real-data regression test of the full patient flow | `test_reproduces_audited_cohort` |
+| H7 | Impulse sign or units wrong | Features measure the wrong quantity | Analytic check on half-sine curves | `test_impulses_match_analytic_values` |
+| H8 | Noisy or incomplete trials | Unstable features | Validity rule; at least 3 valid trials per leg | `test_quality_rule`, `test_session_difference_needs_three_valid_trials_per_leg` |
+| H9 | Output read as a confirmed setback or a judgement about the worker | Misuse in care or claims decisions | Fixed intended-use notice on every output; no judgement wording | `test_report_page_carries_notice_and_no_forbidden_terms`, `test_prototype_carries_notice_and_no_forbidden_terms` |
+| H10 | Random session-to-session variation read as real change | False impression of improvement or decline | Corrected limit adds visit-to-visit variation estimated on other patients (split-half calibrated: 4.7% beyond the 95% limit); protocol same-day limit kept as an option and labelled | `test_change_within_noise_is_not_called_change`, `test_large_improvement_is_beyond_noise`, `test_between_session_sd_recovers_planted_day_to_day_variation`, `test_corrected_limit_is_wider_than_within_session_limit` |
+| H11 | Patient compared against a reference that includes themselves | Percentile biased toward the patient | Reference built from other patients only; enforced in code | `test_reference_must_exclude_patient` |
+| H12 | Review prompt read as a judgement about the worker | Misuse in claim or work-capacity decisions | Pre-specified, measurement-only flag wording; fixed notice on every page; synthetic banner on demos | `test_persistent_deficit_flag`, `test_typical_recovery_raises_no_flag`, `test_decline_flag` |
+| H13 | A model-development step learns from held-out patients (e.g. the M1 autoencoder sees held-out healthy controls) | Optimistic validation | All learning inside training folds; healthy controls split by subject | `test_autoencoder_never_sees_held_out_healthy_controls`, `test_cv_predict_covers_every_row_once` |
+| H14 | Corrected limit hides a real decline | A clinically important decline is not prompted | Missed-decline analysis quantifies the cost (24% of 0.05 BW declines flagged); both limits shown and labelled in the prototype; limitation stated in the report, summary and README; clinical threshold to be set with clinicians, not by statistics | `test_corrected_limit_misses_a_decline_the_original_catches` |

@@ -1,0 +1,202 @@
+<title>GaitRec Rehab Review</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700&family=Public+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: patient list on the left, one patient's force-plate review on the right; stacks on phones. */
+:root{
+  --bg:#f1f4f3; --surface:#ffffff; --ink:#17211e; --muted:#5a6661; --rule:#d7dedb;
+  --accent:#1d5c74; --band:rgba(29,92,116,.13); --amber:#8f5300; --amber-bg:#fbefdb; --sel:#e3edf1;
+  --display:"Archivo","Helvetica Neue",Arial,sans-serif; --body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#101715; --surface:#17201d; --ink:#e3eae7; --muted:#9aa8a2; --rule:#2a3531;
+  --accent:#86bfd6; --band:rgba(134,191,214,.17); --amber:#f0b35c; --amber-bg:#33280f; --sel:#1f2f35; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#101715; --surface:#17201d; --ink:#e3eae7; --muted:#9aa8a2; --rule:#2a3531;
+  --accent:#86bfd6; --band:rgba(134,191,214,.17); --amber:#f0b35c; --amber-bg:#33280f; --sel:#1f2f35; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+.wrap{max-width:1180px;margin:0 auto;display:grid;gap:16px}
+header h1{font:700 24px/1.2 var(--display);margin:0;letter-spacing:-.01em;text-wrap:balance}
+header p{margin:4px 0 0;color:var(--muted);font-size:13.5px;max-width:78ch}
+.notice{background:var(--surface);border:1px solid var(--rule);border-left:3px solid var(--accent);padding:10px 14px;font-size:13px;color:var(--muted);border-radius:6px}
+.stats{display:flex;flex-wrap:wrap;gap:8px 22px;font-size:13px;color:var(--muted)}
+.stats b{font:500 15px var(--mono);color:var(--ink);font-variant-numeric:tabular-nums;margin-right:4px}
+.main{display:grid;grid-template-columns:minmax(260px,330px) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:820px){.main{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--surface);border:1px solid var(--rule);border-radius:8px;min-width:0}
+.filters{display:grid;gap:10px;padding:12px;border-bottom:1px solid var(--rule)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:600 12.5px var(--body);border:1px solid var(--rule);background:transparent;color:var(--ink);padding:4px 10px;border-radius:999px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.lbl{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:3px}
+select,input{width:100%;font:14px var(--body);padding:6px 8px;border:1px solid var(--rule);border-radius:6px;background:var(--bg);color:var(--ink)}
+.list{max-height:68vh;overflow:auto}
+.row{display:grid;grid-template-columns:auto 1fr auto;gap:2px 10px;padding:9px 12px;border-bottom:1px solid var(--rule);cursor:pointer;background:transparent;border-left:0;border-right:0;border-top:0;width:100%;text-align:left;color:var(--ink);font:inherit}
+.row:hover,.row[aria-selected="true"]{background:var(--sel)}
+.row .id{font:500 13.5px var(--mono)}
+.row .meta{font-size:12.5px;color:var(--muted)}
+.row .pills{grid-column:1/-1;display:flex;gap:4px;flex-wrap:wrap}
+.pill{font-size:11px;font-weight:600;color:var(--amber);background:var(--amber-bg);border-radius:4px;padding:1px 6px}
+.count{font-size:12px;color:var(--muted);padding:8px 12px}
+.detail{padding:16px;display:grid;gap:14px}
+.detail h2{font:700 19px var(--display);margin:0}
+.sub{color:var(--muted);font-size:13px;margin:2px 0 0}
+.prompts{background:var(--amber-bg);border-radius:8px;padding:10px 14px}
+.prompts h3{margin:0 0 4px;font:600 13px var(--body);color:var(--amber);letter-spacing:.04em;text-transform:uppercase}
+.prompts ul{margin:0;padding-left:18px} .prompts.none{background:var(--bg)} .prompts.none h3{color:var(--muted)}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--rule);white-space:nowrap}
+th{font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:600}
+td.n{font:13.5px var(--mono);font-variant-numeric:tabular-nums}
+.charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.chart{border:1px solid var(--rule);border-radius:8px;padding:10px 12px;min-width:0}
+.chart h4{margin:0;font:600 14px var(--body)} .chart p{margin:0 0 6px;font-size:12px;color:var(--muted)}
+svg{width:100%;height:auto;display:block}
+.tick{fill:var(--muted);font:11px var(--mono)} .zero{stroke:var(--muted);stroke-dasharray:3 4;stroke-width:1}
+.band{fill:var(--band)} .trend{fill:none;stroke:var(--accent);stroke-width:2} .dot{fill:var(--accent)} .err{stroke:var(--accent);stroke-width:1.4}
+.foot{font-size:12.5px;color:var(--muted);max-width:90ch}
+.summary{font-size:14.5px;margin:0;max-width:75ch}
+.verify{border:1px solid var(--rule);border-radius:8px;padding:10px 14px}
+.verify h3,.why h3{margin:0 0 4px;font:600 13px var(--body);letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.verify ul{margin:0;padding-left:18px;font-size:13.5px}
+.why{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:12px 16px;display:grid;gap:8px}
+.why .cmp{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.why .cell{border-left:3px solid var(--rule);padding-left:10px;font-size:13px;color:var(--muted)}
+.why .cell b{display:block;font:500 18px var(--mono);color:var(--ink)}
+.why .cell.good{border-left-color:var(--accent)}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>GaitRec Rehab Review</h1>
+    <p>Force-plate walking measurements during the first rehabilitation stay, for patients of the rehabilitation centre of the Austrian Workers' Compensation Board (AUVA), from the public GaitRec dataset (2007–2018). De-identified research data.</p>
+  </header>
+  <div class="notice">Research prototype. These are walking-force measurements, not a diagnosis or an assessment of recovery, work capacity, causation or impairment. Walking speed was not recorded and can change these values. Interpret only alongside the treating clinician's assessment.</div>
+  <div class="stats" id="stats"></div>
+  <div class="main">
+    <div class="panel">
+      <div class="filters">
+        <div><span class="lbl" id="lbl-inj">Injury</span><div class="chips" id="chips" role="group" aria-labelledby="lbl-inj"></div></div>
+        <div><label class="lbl" for="flag">Review prompt</label>
+          <select id="flag"><option value="">All patients</option><option value="any">Any prompt</option>
+            <option value="persistent_loading_deficit">Persistent low loading</option>
+            <option value="loading_declined">Loading declined</option>
+            <option value="loading_above_typical_range">Loading above typical range</option></select></div>
+        <div><label class="lbl" for="thr">Change threshold</label>
+          <select id="thr"><option value="c">Corrected: includes visit-to-visit variation</option>
+            <option value="o">Original: same-day noise only (frozen protocol)</option></select></div>
+        <div><label class="lbl" for="q">Patient ID</label><input id="q" inputmode="numeric" placeholder="e.g. 1079"></div>
+      </div>
+      <div class="count" id="count"></div>
+      <div class="list" id="list" role="listbox" aria-label="Patients"></div>
+    </div>
+    <div class="panel"><div class="detail" id="detail"></div></div>
+  </div>
+  <div class="why" id="why"></div>
+  <p class="foot" id="foot"></p>
+</div>
+
+<script>
+const DATA = /*__DATA__*/null;
+const G = {K:"Knee",A:"Ankle",H:"Hip",C:"Heel"};
+const F = [["Weight accepted by injured leg","body weights"],["Braking by injured leg","body-weight·s"],["Push-off by injured leg","body-weight·s"]];
+const KEYS = ["peak_loading","braking_impulse","propulsive_impulse"];
+const FLAG = {persistent_loading_deficit:["Persistent low loading","Loading on the injured leg is low for this injury group and week, and has not changed beyond the threshold since the first assessment."],
+  loading_declined:["Lower loading than first visit","Loading on the injured leg is lower than at the first assessment by more than the threshold."],
+  loading_above_typical_range:["Loading above typical range","Loading on the injured leg relative to the other leg is above the typical range for this injury group and week."]};
+let groups = new Set(Object.keys(G)), current = null;
+const flagsOf = p => $("#thr").value==="o" ? p.fo : p.fc;
+const $ = s => document.querySelector(s);
+const fmt = (v, d=3) => { let s = v.toFixed(d); if (/^-0\.0+$/.test(s)) s = s.slice(1); return (s[0]==="-" ? "" : "+") + s; };
+
+function stats(){
+  const P = DATA.patients, any = P.filter(p=>flagsOf(p).length).length;
+  const c = k => P.filter(p=>flagsOf(p).includes(k)).length;
+  $("#stats").innerHTML = `<span><b>${P.length.toLocaleString()}</b>patients</span><span><b>${DATA.sessions.toLocaleString()}</b>assessments</span>`+
+   `<span><b>${any}</b>with a review prompt</span><span><b>${c("persistent_loading_deficit")}</b>persistent low loading</span>`+
+   `<span><b>${c("loading_declined")}</b>lower than first visit</span><span><b>${c("loading_above_typical_range")}</b>above typical range</span>`;
+  const W = DATA.why;
+  $("#why").innerHTML = `<h3>Why visit-to-visit variation matters</h3>
+   <p class="foot" style="margin:0">Repeated steps on one day give a same-day noise estimate (typically ±${(1.96*W.se_session).toFixed(3)} body weights for weight accepted). Between visits, measurements also move for ordinary reasons: walking speed, fatigue, pain, footwear fit. In this cohort that adds about ${W.extra_sd.toFixed(3)} body weights of spread to every change between two visits.</p>
+   <div class="cmp"><div class="cell"><b>${W.beyond_within}%</b>of visit-to-visit changes exceed the same-day-only threshold (5% expected)</div>
+   <div class="cell good"><b>${W.beyond_corr}%</b>exceed the corrected threshold, checked on patients it was not estimated from</div>
+   <div class="cell"><b>${W.dec_o}%</b>of patients get a "lower than first visit" prompt with the original threshold</div>
+   <div class="cell good"><b>${W.dec_c}%</b>with the corrected threshold</div></div>
+   <p class="foot" style="margin:0">The same corrected threshold holds in each injury group. Share of visit-to-visit changes in weight accepted beyond it (5% intended): ${Object.entries(W.groups).map(([k,v])=>`${k.toLowerCase()} ${v}%`).join(", ")}. These results apply to these four lower-limb injury groups only.</p>
+   <p class="foot" style="margin:.5em 0 0"><b>The trade-off.</b> A wider threshold also misses more real declines. When a 0.05 body-weight decline was added to real patients' latest visits, the original threshold flagged ${W.miss.o}% and the corrected threshold ${W.miss.c}%. The corrected threshold needs about ${W.miss.d80} body weights to flag 80%. It is statistically calibrated, not clinically validated: no one has yet established what size of decline matters for a patient.</p>`;
+  $("#foot").innerHTML = `Bars on the charts show each visit's same-day 95% noise range. Shaded bands: 10th–90th percentile of patients with the same injury in the same week of their stay. The corrected threshold for each patient is estimated from the other half of the cohort. These thresholds are research settings, not clinically validated limits.`;
+}
+function chips(){
+  $("#chips").innerHTML = Object.entries(G).map(([k,v])=>`<button class="chip" data-g="${k}" aria-pressed="true">${v}</button>`).join("");
+  document.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{const k=b.dataset.g; groups.has(k)?groups.delete(k):groups.add(k); b.setAttribute("aria-pressed",groups.has(k)); list();});
+}
+function filtered(){
+  const fl = $("#flag").value, q = $("#q").value.trim();
+  return DATA.patients.filter(p=>groups.has(p.g) && (!fl || (fl==="any"?flagsOf(p).length:flagsOf(p).includes(fl))) && (!q || String(p.id).startsWith(q)));
+}
+function list(){
+  const P = filtered();
+  $("#count").textContent = `${P.length.toLocaleString()} patient${P.length===1?"":"s"}`;
+  $("#list").innerHTML = P.slice(0,400).map(p=>`<button class="row" role="option" data-id="${p.id}" aria-selected="${current&&current.id===p.id}">
+    <span class="id">#${p.id}</span><span class="meta">${G[p.g]} · ${p.s.length} assessment${p.s.length>1?"s":""}</span><span class="meta">${p.sex}, ${p.age}</span>
+    ${flagsOf(p).length?`<span class="pills">${flagsOf(p).map(f=>`<span class="pill">${FLAG[f][0]}</span>`).join("")}</span>`:""}</button>`).join("") +
+    (P.length>400?`<div class="count">Showing the first 400. Filter or search by ID to narrow.</div>`:"");
+  document.querySelectorAll(".row").forEach(r=>r.onclick=()=>show(+r.dataset.id));
+}
+function chart(p, j){
+  const W=420,H=190,L=58,R=14,T=14,B=30, xs=p.s.map(r=>r[0]), v=p.s.map(r=>r[2+j]), se=p.s.map(r=>r[5+j]);
+  const band = xs.map(w=>(DATA.bands[p.g]||{})[w]?.[KEYS[j]]||null);
+  const all=[0,...v.map((x,i)=>x-1.96*se[i]),...v.map((x,i)=>x+1.96*se[i]),...band.flat().filter(x=>x!=null)];
+  let lo=Math.min(...all), hi=Math.max(...all); const pad=(hi-lo)*.1||.01; lo-=pad; hi+=pad;
+  const x0=Math.min(...xs), x1=Math.max(...xs);
+  const X=w=>L+(x1===x0?.5:(w-x0)/(x1-x0))*(W-L-R), Y=y=>T+(hi-y)/(hi-lo)*(H-T-B);
+  const dec=(hi-lo)>=.2?2:3;
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${F[j][0]} by week">`;
+  const bp=xs.map((w,i)=>band[i]?[X(w),band[i]]:null).filter(Boolean);
+  if(bp.length>=2) s+=`<polygon class="band" points="${bp.map(([x,b])=>`${x},${Y(b[1])}`).join(" ")} ${bp.slice().reverse().map(([x,b])=>`${x},${Y(b[0])}`).join(" ")}"/>`;
+  s+=`<line class="zero" x1="${L}" x2="${W-R}" y1="${Y(0)}" y2="${Y(0)}"/>`;
+  [lo+pad,(lo+hi)/2,hi-pad].forEach(t=>s+=`<text class="tick" x="${L-6}" y="${Y(t)+4}" text-anchor="end">${fmt(t,dec)}</text>`);
+  xs.forEach(w=>s+=`<text class="tick" x="${X(w)}" y="${H-10}" text-anchor="middle">wk ${w}</text>`);
+  s+=`<polyline class="trend" points="${xs.map((w,i)=>`${X(w)},${Y(v[i])}`).join(" ")}"/>`;
+  xs.forEach((w,i)=>{s+=`<line class="err" x1="${X(w)}" x2="${X(w)}" y1="${Y(v[i]-1.96*se[i])}" y2="${Y(v[i]+1.96*se[i])}"/><circle class="dot" cx="${X(w)}" cy="${Y(v[i])}" r="4"/>`;});
+  return s+`</svg>`;
+}
+function show(id){
+  const p = DATA.patients.find(x=>x.id===id); if(!p) return; current=p;
+  try{history.replaceState(null,"","#p"+id)}catch(e){}
+  document.querySelectorAll(".row").forEach(r=>r.setAttribute("aria-selected", +r.dataset.id===id));
+  const a=p.s[0], b=p.s[p.s.length-1], days=b[1];
+  const corr = $("#thr").value!=="o", tau = DATA.tau[p.h], fl = flagsOf(p);
+  const lim = (j,k) => 1.96*Math.sqrt(a[5+j]**2 + b[5+j]**2 + (corr ? tau[k]**2 : 0));
+  const res = KEYS.map((k,j)=>({ch:b[2+j]-a[2+j], lim:lim(j,k)}));
+  const rows = KEYS.map((k,j)=>{const {ch,lim:L}=res[j];
+    const verdict = p.s.length<2?"Only one visit": Math.abs(ch)>L ? "Changed by more than the threshold" : "Within the threshold";
+    return `<tr><td>${F[j][0]}</td><td class="n">${fmt(a[2+j])}</td><td class="n">${fmt(b[2+j])}</td><td class="n">${p.s.length<2?"—":fmt(ch)}</td><td class="n">±${L.toFixed(3)}</td><td>${verdict}</td></tr>`}).join("");
+  const pl = res[0], word = pl.ch>0 ? "more" : "less";
+  const summary = p.s.length<2 ? "Only one visit is recorded, so no change can be described."
+    : Math.abs(pl.ch)>pl.lim ? `Between the first and latest visit (${days} days apart), the injured leg took ${word} weight relative to the other leg: a change of ${fmt(pl.ch)} body weights, larger than the ±${pl.lim.toFixed(3)} threshold.`
+    : `Between the first and latest visit (${days} days apart), the change in weight accepted by the injured leg (${fmt(pl.ch)} body weights) is within the ±${pl.lim.toFixed(3)} threshold, so it cannot be told apart from ordinary variation.`;
+  $("#detail").innerHTML = `<div><h2>Patient #${p.id}</h2><p class="sub">${G[p.g]} injury · ${p.side} side affected · ${p.sex}, age ${p.age} · ${p.s.length} assessment${p.s.length>1?"s":""} over ${days} days</p></div>
+   <p class="summary">${summary}</p>
+   <div class="prompts ${fl.length?"":"none"}"><h3>Review prompts</h3>${fl.length?`<ul>${fl.map(f=>`<li>${FLAG[f][1]}</li>`).join("")}</ul>`:`<p class="sub" style="margin:0">No pre-specified prompt${p.s.length<3?" (some prompts need at least three visits)":""}.</p>`}</div>
+   <div class="tablewrap"><table><tr><th>Injured minus uninjured leg</th><th>First</th><th>Latest</th><th>Change</th><th>Threshold</th><th>Result</th></tr>${rows}</table></div>
+   <div class="verify"><h3>Before anyone acts on this, the treating clinician would check</h3><ul>
+     <li>walking speed, walking aids and pain on each visit day;</li>
+     <li>changes in footwear, insoles, weight-bearing orders or treatment between visits;</li>
+     <li>whether the stay includes a planned step, such as staged surgery or hardware removal;</li>
+     <li>whether the measurements match the clinician's own examination.</li></ul>
+     <p class="sub" style="margin:6px 0 0">This page does not indicate deterioration, recovery failure, causation or capacity for work.</p></div>
+   <div class="charts">${KEYS.map((k,j)=>`<div class="chart"><h4>${F[j][0]}</h4><p>${F[j][1]}, injured minus uninjured</p>${chart(p,j)}</div>`).join("")}</div>`;
+}
+stats(); chips(); list();
+$("#flag").onchange=list; $("#q").oninput=list;
+$("#thr").onchange=()=>{stats(); list(); if(current) show(current.id);};
+const h = (location.hash||"").match(/^#p(\d+)$/);
+show(h ? +h[1] : (DATA.patients.find(p=>p.id===1079)||DATA.patients[0]).id);
+</script>

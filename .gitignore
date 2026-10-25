@@ -1,0 +1,39 @@
+data/*
+!data/GRF_metadata.csv
+__pycache__/
+*.egg-info/
+
+# Python environments and caches
+.venv/
+venv/
+.env
+.env.*
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.DS_Store
+
+# Generated data and model artifacts
+data/derived/
+results/
+*.pkl
+*.pickle
+*.joblib
+
+# Previous research archives
+archive/
+
+# Temporary and private files
+*.log
+*.key
+*.pem
+*.sqlite
+*.sqlite3
+
+# Local backup
+.gitignore.backup
+
+# Dataset metadata pending redistribution review
+data/GRF_metadata.csv
+docs/faculty/email_to_professor.md

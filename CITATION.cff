@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below, and cite the GaitRec dataset."
+title: "gaitrec-rehab: early gait biomechanics, later rehabilitation stays, and the reliability of visit-to-visit change"
+version: 3.0.0
+date-released: 2026-10-24
+authors:
+  - given-names: Kasra
+license: MIT
+references:
+  - type: article
+    title: "GaitRec, a large-scale ground reaction force dataset of healthy and impaired gait"
+    authors:
+      - family-names: Horsak
+        given-names: Brian
+      - family-names: Slijepcevic
+        given-names: Djordje
+      - family-names: Raberger
+        given-names: Anna-Maria
+      - family-names: Schwab
+        given-names: Caterine
+      - family-names: Worisch
+        given-names: Marianne
+      - family-names: Zeppelzauer
+        given-names: Matthias
+    journal: "Scientific Data"
+    volume: 7
+    start: 143
+    year: 2020

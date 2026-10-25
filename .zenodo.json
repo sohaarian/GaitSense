@@ -1,0 +1,28 @@
+{
+  "title": "gaitrec-rehab: early gait biomechanics, later rehabilitation stays, and the reliability of visit-to-visit change",
+  "upload_type": "software",
+  "version": "3.0.0",
+  "description": "Reliable longitudinal gait monitoring across four lower-extremity injury groups, on the open GaitRec dataset (1,667 rehabilitation patients). Visit-to-visit changes in force-plate measurements were about twice as variable as same-day noise predicts; a threshold adding visit-to-visit variation was calibrated in held-out patients and in each of four injury groups, with an analysis of the declines it misses. A prediction study with a frozen internal protocol found early gait did not predict a later rehabilitation stay (AUROC difference -0.009, 95% interval -0.057 to 0.073). Statistical calibration only; not clinically validated. Code, tests, independent re-implementation, frozen protocol, results and technical report.",
+  "creators": [
+    {
+      "name": "Kasra"
+    }
+  ],
+  "license": "MIT",
+  "keywords": [
+    "gait analysis",
+    "ground reaction force",
+    "rehabilitation",
+    "clinical prediction",
+    "measurement reliability",
+    "workers' compensation",
+    "GaitRec"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "10.1038/s41597-020-0481-z",
+      "relation": "references",
+      "scheme": "doi"
+    }
+  ]
+}
