@@ -1,0 +1,10 @@
+GaitSense v3.0 — Research Prototype
+
+This website demonstrates research-stage gait analysis
+and rehabilitation monitoring concepts.
+
+Any simulated outputs are demonstrations, not
+clinically validated recovery predictions.
+
+Not intended for patient diagnosis, treatment,
+disability determinations, or return-to-work decisions.
