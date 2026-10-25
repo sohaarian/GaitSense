@@ -14,14 +14,14 @@
 
 **Bottom line.** Across the evaluated models, vertical-force measurements provided insufficient information to reliably detect most force-plate-defined push-off changes, and more sophisticated modelling did not resolve this. The results set seven device requirements (D1–D7), and they point to the next step: a portable sensor that measures shear or front–back motion directly (`docs/next_stage_sensor_proposal.md`).
 
-**Version 1.3.0.** Changes: `CHANGELOG.md`. A prediction study, also under a frozen protocol, found that first-week gait did not predict a later rehabilitation stay. That null result led to the reliability question.
+**Version history.** See `CHANGELOG.md`. An earlier prediction study, also under a frozen protocol, found that first-week gait did not predict a later rehabilitation stay. That null result led to the reliability question.
 
 ## Version 3.0: one platform, two model families
 
 | | Capability 1: biomechanical forecasting and monitoring | Capability 2: clinical recovery prediction |
 |---|---|---|
 | Question | Predict the next force measurement, quantify its uncertainty, judge whether a change is unusual | Do biomechanical forecasts add predictive value for independently measured recovery outcomes beyond clinical data alone? |
-| Status | Validated on GaitRec (v2.0 results unchanged); post-hoc conformal option added | Built and tested on labelled synthetic controls; **no clinical results**; needs a verified linked dataset |
+| Status | Validated on GaitRec (v2.0 results unchanged); post-hoc conformal option added | Built and tested on labelled synthetic controls; no clinical results yet, pending a verified linked dataset |
 
 Both run independently and can be evaluated together through a leakage-safe landmark design once legitimately linked
 patient-level biomechanical and clinical outcome data are available. A verification gate refuses unverified or
@@ -41,9 +41,9 @@ benefit decisions.
 | Is their uncertainty trustworthy? | Yes on average. Same-day-noise intervals covered 74% of a nominal 95%; the GP covered 94.6% with 14% narrower intervals than a fixed between-visit correction. |
 | Do monitoring rules agree on the same visits? | No. Native rules flagged 1% to 20% of identical visit pairs; the trajectory-based rule detects more injected changes but is less stable under force perturbations. Asymmetry rules miss bilateral change. |
 
-Manuscript: `docs/gaitsense_ai_manuscript.pdf`. Protocol: `docs/ai_protocol.md` (hashed before analysis). Audit: `docs/medical_ai_baseline_audit.md`. Verification: `docs/ai_verification_report.md`. Portfolio summary: `docs/yale_technical_portfolio.md`. Prototype: `prototype/gaitsense_ai_review.html`.
+Manuscript: `docs/gaitsense_ai_manuscript.pdf`. Protocol: `docs/ai_protocol.md` (hashed before analysis). Audit: `docs/medical_ai_baseline_audit.md`. Verification: `docs/ai_verification_report.md`. Technical summary: `docs/yale_technical_portfolio.md`. Prototype: `prototype/gaitsense_ai_review.html`.
 
-Reproduce (RAW GaitRec files in `data/raw/`):
+Reproduce (raw GaitRec files in `data/raw/`):
 
 ```
 python scripts/ai/s3a_extract.py && python scripts/ai/s3b_build.py
@@ -68,12 +68,12 @@ Version 2.0 code, analyses and documents were produced with an AI assistant (Cla
 
 - **That a crossing is clinically important.** The threshold is *statistically* calibrated: it controls how often ordinary variation crosses it. It has not been tested against clinical judgement or any outcome.
 - **That the threshold catches the declines that matter.** It flags 24% of 0.05 body-weight declines and needs about 0.12 body weights to flag 80% (`scripts/missed_decline.py`). The original threshold flags more declines but prompts for one patient in five.
-- **How much of τ is measurement error rather than real change.** That needs a test–retest study (`docs/test_retest_protocol.md`).
+- **How much of τ is measurement error rather than real change.** That needs a test–retest study (see Future work).
 - **Anything beyond this setting.** The results do not cover other injuries, other centres, or the years after 2007–2018.
 - **That an affordable sensor can replace force plates for push-off monitoring.** It could not, with vertical force and the models evaluated (Studies 2–3).
 - **Anything about real insoles.** The inputs were force-plate vertical signals.
 - **Clinical benefit.** Nothing here was compared against pain, function, return to work or MMI.
-- **That clinicians can use it, or that anyone outside the project has checked it.** Neither has happened yet (see Status).
+- **Clinical usability or external review.** Neither has been evaluated yet (see Future work).
 
 ## Studies 2 and 3 in more detail
 
@@ -81,7 +81,7 @@ A second study (`docs/shear_report.pdf`, protocol `docs/shear_protocol.md`) test
 
 - **Peak vertical loading carries no push-off change information** (CCC 0.00). The full vertical curve does: it explains 32% of push-off change.
 - **The AI gets the direction of real change right 89% of the time** (88% in hard cases where vertical loading did not move, against 58% for vertical only). Its predictions are calibrated but capture only about a quarter of the variation in real change, and it flags 30% of real changes.
-- **Final experiment** (`docs/detection_protocol.md`): models trained directly on change (paired visits, including a CNN) detected no more real push-off changes than reconstruction: 31% vs 32% at a 5% false-positive rate in cross-validation, and 8% (0–33%) on a 12-change temporal hold-out. Across the evaluated models, vertical-force measurements provided insufficient information to reliably detect most force-plate-defined push-off changes, and more sophisticated modelling did not resolve this. The next step is to test a sensor that measures shear or front–back motion directly (`docs/next_stage_sensor_proposal.md`).
+- **Final experiment** (`docs/detection_protocol.md`): models trained directly on change (paired visits, including a CNN) detected no more real push-off changes than reconstruction: 31% vs 32% at a 5% false-positive rate in cross-validation, and 8% (0–33%) on a 12-change temporal hold-out.
 - **Simulated insole conditions:** 100 Hz sampling loses nothing; insole-scale gain and noise error matters most.
 - **Two more failure modes:** half of injured-minus-uninjured alerts involve real change in the uninjured leg, and history-based forecasts did not beat carrying the last value forward.
 - **Output:** seven design inputs (D1–D7) for a workers' compensation rehabilitation tracker. This is computational feasibility under simulated sensing, not a validated device.
@@ -90,19 +90,23 @@ The per-step extract (`data/derived/steps_*.npz`, 82 MB each) is too large for t
 
 ## Status
 
-| Item | State |
-|---|---|
-| Analysis, tests (37), report-number check (92 checks) | Done |
-| Independent re-implementation of reliability results | Done (`verification/`); written by the same author |
-| Missed-decline analysis | Done (report Section 3.6) |
-| Study 2: AI reconstruction (frozen protocol) | Done; independent check passes |
-| Study 3: direct change detection (frozen protocol, temporal hold-out evaluated once) | Done; independent check passes |
-| Next-stage sensor study | **Proposal only** (`docs/next_stage_sensor_proposal.md`); needs a lab, hardware and ethics approval |
-| Outside statistical review | **Not done.** Guide: `docs/verification_guide.md` |
-| Clinician feedback | **Not done.** Form: `docs/clinician_feedback_form.md` |
-| Usability testing with intended users | **Not done.** Protocol: `docs/usability_protocol.md` |
-| Test–retest study | **Not done.** Protocol: `docs/test_retest_protocol.md`; needs a gait lab |
-| Public repository, versioned release, DOI | v1.1.0 released on Zenodo (record 23611093); v2.0.0 and v3.0.0 not yet released. Steps below |
+**Completed**
+
+- Analysis, 37 tests and 92 automated checks of every reported number
+- Independent clean-room re-implementation of the reliability results (`verification/`, by the project author; imports nothing from the package)
+- Missed-decline analysis (report Section 3.6)
+- Study 2 (AI reconstruction) and Study 3 (direct change detection) under frozen protocols, each with an independent check; the temporal hold-out was evaluated once
+- v1.1.0 archived on Zenodo (record 23611093)
+
+**Future work**
+
+| Study | Protocol | Requirements |
+|---|---|---|
+| Portable shear-sensor study | `docs/next_stage_sensor_proposal.md` | Gait lab, hardware, ethics approval |
+| Test–retest study | `docs/test_retest_protocol.md` | Gait lab |
+| Outside statistical review | `docs/verification_guide.md` | External reviewer |
+| Clinician feedback | `docs/clinician_feedback_form.md` | Clinician participants |
+| Usability testing with clinicians and case managers | `docs/usability_protocol.md` | Intended users |
 
 ## Cohort (reproduced by `tests/test_cohort.py`)
 
@@ -155,7 +159,7 @@ docs/shear_protocol.md           frozen protocol, version 2 (hashes in shear_pro
 docs/shear_report.md/.pdf        Studies 2 and 3: AI reconstruction, direct detection, design inputs D1–D7
 docs/next_stage_sensor_proposal.md  proposal for a portable shear-sensor study
 docs/technical_report.md/.pdf    TRIPOD+AI-structured technical report
-docs/preregistration.md          the frozen analysis plan; SHA-256 and self-recorded time in preregistration.sha256
+docs/preregistration.md          frozen internal analysis plan, hashed before analysis (preregistration.sha256)
 docs/deviations.md               protocol audit, deviations and post-hoc additions A–H
 docs/verification_guide.md       step-by-step check for an outside reviewer
 docs/data_checksums.txt          SHA-256 of the metadata and derived data files
@@ -164,14 +168,13 @@ docs/clinician_feedback_form.md  20-minute structured feedback form
 docs/usability_protocol.md       protocol for a clinician / case-manager usability study
 docs/model_card.md               intended use, performance and limits of the models
 docs/hazard_log.md               hazards, mitigations and the test covering each
-docs/faculty/                    two-page summary, demo script, email draft, research narrative
 prototype/gait_review.html       interactive review prototype (open in a browser)
 results/                         analysis outputs (JSON) and example review pages
 ```
 
 ## Data
 
-`data/GRF_metadata.csv` is GaitRec's metadata file (CC0). The four raw force files (CC BY 4.0, about 1 GB) are never committed. Download them from figshare into `data/`, then run `python scripts/verify_downloads.py`, which checks each file's size and MD5 against figshare.
+`data/GRF_metadata.csv` is GaitRec's metadata file (CC0). The four raw force files (CC BY 4.0, about 1 GB) are not included. Download them from figshare into `data/`, then run `python scripts/verify_downloads.py`, which checks each file's size and MD5 against figshare.
 
 The derived files in `data/derived/` are enough to rerun every analysis except feature extraction. Check them with:
 
@@ -210,13 +213,8 @@ python scripts/reproduce_check.py && python scripts/check_report.py
 
 Research only. Outputs are a prompt for clinical review. They are not for causation, compensability, impairment or work-capacity decisions.
 
-## Publishing (needs the author)
+## Citation
 
-1. **GitHub:** create a public repository and upload this folder. The raw force files are excluded by `.gitignore`.
-2. **Release:** tag `v1.1.0` and paste the 1.1.0 section of `CHANGELOG.md` as the release notes.
-3. **Zenodo:** connect the GitHub repository before tagging, so that the release receives a DOI. Then add the DOI to `CITATION.cff` and this README.
-4. **OSF (optional):** upload `docs/preregistration.md` and `docs/preregistration.sha256`, labelled as a frozen internal protocol that was hashed before the analysis but posted afterwards. It is not an independently timestamped pre-registration.
+Software: see `CITATION.cff` (v1.1.0 archived on Zenodo, record 23611093).
 
-## Citation of the data
-
-Horsak B, Slijepcevic D, Raberger AM, Schwab C, Worisch M, Zeppelzauer M. GaitRec, a large-scale ground reaction force dataset of healthy and impaired gait. *Scientific Data*. 2020;7:143. Data licensed CC BY 4.0 (metadata CC0).
+Data: Horsak B, Slijepcevic D, Raberger AM, Schwab C, Worisch M, Zeppelzauer M. GaitRec, a large-scale ground reaction force dataset of healthy and impaired gait. *Scientific Data*. 2020;7:143. Data licensed CC BY 4.0 (metadata CC0).
